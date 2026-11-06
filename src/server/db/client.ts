@@ -27,10 +27,25 @@ export type DbEnv = {
   PGLITE_DIR?: string;
 };
 
+/**
+ * Hosts such as Neon hand out URLs with `sslmode=require`. Today `pg` treats
+ * that as `verify-full`, but from pg 9 it will stop checking the server's
+ * certificate. Naming `verify-full` keeps that protection across the upgrade.
+ */
+export function withVerifiedSsl(connectionString: string): string {
+  return connectionString.replace(
+    /([?&]sslmode=)(?:prefer|require|verify-ca)(?=&|$)/,
+    "$1verify-full",
+  );
+}
+
 export async function createPostgresDb(connectionString: string): Promise<Db> {
   const { Pool } = await import("pg");
   const { drizzle } = await import("drizzle-orm/node-postgres");
-  const pool = new Pool({ connectionString, max: 5 });
+  const pool = new Pool({
+    connectionString: withVerifiedSsl(connectionString),
+    max: 5,
+  });
   return drizzle(pool, { schema });
 }
 

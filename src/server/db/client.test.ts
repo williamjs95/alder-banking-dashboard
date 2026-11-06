@@ -12,6 +12,7 @@ import {
   createPostgresDb,
   getDb,
   type Db,
+  withVerifiedSsl,
 } from "./client";
 import { workspaces } from "./schema";
 
@@ -241,5 +242,39 @@ describe("getDb", () => {
     expect(recovered).not.toBe(failed);
     expect(await tableNames(await recovered)).toContain("workspaces");
     expect(getDb()).toBe(recovered);
+  });
+});
+
+describe("withVerifiedSsl", () => {
+  it.each(["prefer", "require", "verify-ca"])(
+    "makes sslmode=%s an explicit verify-full",
+    (mode) => {
+      expect(withVerifiedSsl(`postgres://u:p@host/db?sslmode=${mode}`)).toBe(
+        "postgres://u:p@host/db?sslmode=verify-full",
+      );
+    },
+  );
+
+  it("keeps the other parameters, wherever sslmode sits among them", () => {
+    expect(
+      withVerifiedSsl("postgres://u:p@host/db?a=1&sslmode=require&b=2"),
+    ).toBe("postgres://u:p@host/db?a=1&sslmode=verify-full&b=2");
+  });
+
+  it.each([
+    "postgres://u:p@host/db",
+    "postgres://u:p@host/db?sslmode=disable",
+    "postgres://u:p@host/db?sslmode=verify-full",
+    "postgres://require:p@host/db?application_name=sslmode=require",
+  ])("leaves %s as it is", (url) => {
+    expect(withVerifiedSsl(url)).toBe(url);
+  });
+
+  it("is what the connection pool is given", async () => {
+    const db = await createPostgresDb(`${POSTGRES_URL}?sslmode=require`);
+
+    expect(poolOf(db).options.connectionString).toBe(
+      `${POSTGRES_URL}?sslmode=verify-full`,
+    );
   });
 });
