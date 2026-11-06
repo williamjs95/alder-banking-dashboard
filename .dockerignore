@@ -1,0 +1,29 @@
+# Secrets never enter the build context.
+.env*
+!.env.example
+.vercel
+
+# Rebuilt inside the image.
+node_modules
+.next
+*.tsbuildinfo
+
+# Local data and output.
+.data
+coverage
+test-results
+playwright-report
+blob-report
+
+# Not needed to build the app.
+.git
+.github
+e2e
+test
+**/*.test.ts
+**/*.test.tsx
+playwright.config.ts
+vitest.config.mts
+Dockerfile
+.dockerignore
+README.md

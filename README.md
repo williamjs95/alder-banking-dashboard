@@ -105,6 +105,23 @@ The unit coverage threshold is 100% and is enforced by `yarn test:coverage`. Thr
 
 End-to-end coverage is measured in the browser and mapped back to source files, so it covers client code only. Each test runs in a fresh browser context, which means a fresh workspace, so tests are independent and run in parallel.
 
+## Continuous integration
+
+Every push and pull request runs three jobs in GitHub Actions:
+
+- **verify:** lint, type-check, unit tests with coverage, and the end-to-end suite.
+- **sonarqube:** sends the code and unit coverage to [SonarQube Cloud](https://sonarcloud.io/project/overview?id=williamjs95_alder-banking-dashboard). It needs a `SONAR_TOKEN` repository secret, and Automatic Analysis turned off in the SonarQube project. Without the secret the scan is skipped.
+- **docker:** builds the image, starts it on a throwaway database, and checks that it serves a page and API data.
+
+## Docker
+
+```bash
+docker build --tag alder .
+docker run --publish 3000:3000 --env ALDER_EMBEDDED_DB=1 --env PGLITE_DIR=memory:// alder
+```
+
+That runs on an in-memory database, which is lost when the container stops. For real data, pass `--env DATABASE_URL=...` instead, after applying migrations with `yarn db:migrate`.
+
 ## Deploying
 
 The app is set up for Vercel with a Neon Postgres database.

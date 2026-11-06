@@ -5,6 +5,9 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -15,9 +18,58 @@ jobs:
         with:
           node-version: 24
           cache: yarn
-      - run: yarn install --frozen-lockfile
+      - run: yarn install --frozen-lockfile --ignore-scripts
       - run: yarn eslint
       - run: yarn typecheck
       - run: yarn test:coverage
+      - uses: actions/upload-artifact@v7
+        with:
+          name: unit-coverage
+          path: coverage/lcov.info
+          retention-days: 1
       - run: yarn playwright install --with-deps chromium
       - run: yarn e2e
+
+  sonarqube:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Sonar reads the history to tell new code from old.
+          fetch-depth: 0
+      - uses: actions/download-artifact@v8
+        with:
+          name: unit-coverage
+          path: coverage
+      # Pull requests from forks do not receive secrets, so the scan is skipped.
+      - name: SonarQube scan
+        if: env.SONAR_TOKEN != ''
+        uses: SonarSource/sonarqube-scan-action@e805d875275f728fac1885b413934be6d7c63f65 # v8.4.1
+
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - run: docker build --tag alder:ci .
+      - name: Start the image on a throwaway database
+        run: >
+          docker run --detach --name alder --publish 3000:3000
+          --env ALDER_EMBEDDED_DB=1 --env PGLITE_DIR=memory://
+          alder:ci
+      - name: Check that it serves pages and data
+        run: |
+          workspace="$(cat /proc/sys/kernel/random/uuid)"
+          for attempt in $(seq 1 30); do
+            curl --silent --fail --output /dev/null http://localhost:3000/robots.txt && break
+            sleep 2
+          done
+          curl --silent --fail --cookie "alder_workspace=$workspace" http://localhost:3000/ | grep --quiet "Overview"
+          curl --silent --fail --cookie "alder_workspace=$workspace" http://localhost:3000/api/accounts | grep --quiet "Operating Checking"
+      - name: Show the container logs if it failed
+        if: failure()
+        run: docker logs alder

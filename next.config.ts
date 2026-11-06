@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
   // The app build type-checks application code only; `yarn typecheck` covers
   // tests and tooling as well.
   typescript: { tsconfigPath: "tsconfig.build.json" },
+  // Set by the Dockerfile. Vercel and `next start` use the regular output.
+  output: process.env.NEXT_OUTPUT === "standalone" ? "standalone" : undefined,
   // Only the end-to-end run needs browser source maps (for coverage mapping).
   productionBrowserSourceMaps: process.env.E2E_SOURCE_MAPS === "1",
   async headers() {
