@@ -1,0 +1,11 @@
+.next
+.data
+coverage
+drizzle
+node_modules
+playwright-report
+test-results
+yarn.lock
+next-env.d.ts
+# Vendored shadcn/ui primitives keep their upstream formatting.
+src/components/ui
