@@ -8,8 +8,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-franklin);
+  --font-display: var(--font-besley);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -17,12 +17,15 @@
   --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-muted: var(--sidebar-muted);
+  --color-sidebar-marker: var(--sidebar-marker);
   --color-sidebar: var(--sidebar);
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
+  --color-chart-ink: var(--chart-ink);
   --color-chart-other: var(--chart-other);
   --color-chart-grid: var(--chart-grid);
   --color-chart-axis: var(--chart-axis);
@@ -62,40 +65,50 @@
 }
 
 /*
- * Warm-neutral surfaces with a single blue accent. Chart colors are the first
- * five slots of a categorical palette checked for color-vision-deficiency
- * separation against these exact card surfaces, in both themes.
+ * The book and its palette. The layout borrows from an account book: the
+ * sidebar is the cover, cards are sheets, hairlines are the rules. The colors
+ * follow Nubank's: white and gray carry almost everything, and one saturated
+ * purple is the accent (roughly 60% white, 30% gray, 10% purple).
+ *
+ *   purple   #820ad1   the cover (sidebar), primary actions, single-series charts
+ *   deep     #6b08ad   purple as text, and the current page on the cover
+ *   lilac    #f3e6fb   soft purple backgrounds
+ *   white    #ffffff   sheets: cards, tables, dialogs
+ *   gray     #f4f4f6   the page; #e1e1e6 for rules
+ *   ink      #1c1b1f   text
+ *
+ * Multi-series charts use a five-color categorical palette led by the purple,
+ * checked for color-vision deficiency against the sheet color of each theme.
  */
 :root {
   color-scheme: light;
-  --radius: 0.625rem;
+  --radius: 0.375rem;
 
-  --background: #f9f9f7;
-  --foreground: #0b0b0b;
-  --card: #fcfcfb;
-  --card-foreground: #0b0b0b;
+  --background: #f4f4f6;
+  --foreground: #1c1b1f;
+  --card: #ffffff;
+  --card-foreground: #1c1b1f;
   --popover: #ffffff;
-  --popover-foreground: #0b0b0b;
-  --primary: #1a1a19;
-  --primary-foreground: #fcfcfb;
-  --secondary: #efeeea;
-  --secondary-foreground: #1a1a19;
-  --muted: #f1f0ec;
-  --muted-foreground: #5f5e5a;
-  --subtle-foreground: #7a7973;
-  --accent: #efeeea;
-  --accent-foreground: #1a1a19;
-  --destructive: #c73434;
-  --border: #e4e3dc;
-  --input: #d5d4cc;
-  --ring: #2a78d6;
+  --popover-foreground: #1c1b1f;
+  --primary: #820ad1;
+  --primary-foreground: #ffffff;
+  --secondary: #ededf1;
+  --secondary-foreground: #1c1b1f;
+  --muted: #ededf1;
+  --muted-foreground: #5c5b66;
+  --subtle-foreground: #6e6d79;
+  --accent: #ededf1;
+  --accent-foreground: #1c1b1f;
+  --destructive: #c0182b;
+  --border: #e1e1e6;
+  --input: #c6c5cf;
+  --ring: #820ad1;
 
-  --brand: #2a78d6;
-  --brand-soft: #e6f0fc;
+  --brand: #820ad1;
+  --brand-soft: #f3e6fb;
   /* The accent as text: a darker step that clears 4.5:1 on every surface. */
-  --brand-ink: #1c5cab;
-  /* Money-in text: dark enough to read as body copy. */
-  --positive: #006300;
+  --brand-ink: #6b08ad;
+  --positive: #0a6e38;
 
   /* Status: always paired with an icon and a label, never color alone. */
   --good: #0ca30c;
@@ -103,72 +116,78 @@
   --serious: #ec835a;
   --critical: #d03b3b;
 
-  --chart-1: #2a78d6;
+  --chart-1: #820ad1;
   --chart-2: #eb6834;
   --chart-3: #1baf7a;
   --chart-4: #eda100;
   --chart-5: #e87ba4;
-  --chart-other: #b9b8ae;
-  --chart-grid: #e8e7e0;
-  --chart-axis: #c3c2b7;
-  --chart-track: #dbe8f9;
+  --chart-ink: #820ad1;
+  --chart-other: #b9b8c2;
+  --chart-grid: #ebebef;
+  --chart-axis: #c6c5cf;
+  --chart-track: #e9d5f8;
 
-  --sidebar: #f4f3ef;
-  --sidebar-foreground: #0b0b0b;
-  --sidebar-primary: #1a1a19;
-  --sidebar-primary-foreground: #fcfcfb;
-  --sidebar-accent: #e9e8e2;
-  --sidebar-accent-foreground: #0b0b0b;
-  --sidebar-border: #e4e3dc;
-  --sidebar-ring: #2a78d6;
+  --sidebar: #820ad1;
+  --sidebar-foreground: #ffffff;
+  --sidebar-muted: #e9d3f8;
+  --sidebar-marker: #ffffff;
+  --sidebar-primary: #ffffff;
+  --sidebar-primary-foreground: #820ad1;
+  --sidebar-accent: #6b08ad;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #9330d8;
+  --sidebar-ring: #ffffff;
 }
 
 [data-theme="dark"] {
   color-scheme: dark;
 
-  --background: #0d0d0d;
-  --foreground: #f0efec;
-  --card: #1a1a19;
-  --card-foreground: #f0efec;
-  --popover: #212120;
-  --popover-foreground: #f0efec;
-  --primary: #f0efec;
-  --primary-foreground: #1a1a19;
-  --secondary: #2a2a28;
-  --secondary-foreground: #f0efec;
-  --muted: #242423;
-  --muted-foreground: #b3b2a8;
-  --subtle-foreground: #8f8e86;
-  --accent: #2a2a28;
-  --accent-foreground: #f0efec;
-  --destructive: #e66767;
-  --border: #2e2e2c;
-  --input: #3d3d3a;
-  --ring: #3987e5;
+  --background: #121114;
+  --foreground: #f2f1f5;
+  --card: #1b1a1f;
+  --card-foreground: #f2f1f5;
+  --popover: #232228;
+  --popover-foreground: #f2f1f5;
+  --primary: #9a2bdf;
+  --primary-foreground: #ffffff;
+  --secondary: #26252b;
+  --secondary-foreground: #f2f1f5;
+  --muted: #26252b;
+  --muted-foreground: #b3b1bd;
+  --subtle-foreground: #9997a3;
+  --accent: #26252b;
+  --accent-foreground: #f2f1f5;
+  --destructive: #f58b92;
+  --border: #2e2d34;
+  --input: #45434d;
+  --ring: #bf6bf0;
 
-  --brand: #3987e5;
-  --brand-soft: #16273d;
-  --brand-ink: #86b6ef;
-  --positive: #3fc23f;
+  --brand: #bf6bf0;
+  --brand-soft: #2e1445;
+  --brand-ink: #d6a3f9;
+  --positive: #4fcb85;
 
-  --chart-1: #3987e5;
+  --chart-1: #a633e6;
   --chart-2: #d95926;
   --chart-3: #199e70;
   --chart-4: #c98500;
   --chart-5: #d55181;
-  --chart-other: #5f5e5a;
-  --chart-grid: #2c2c2a;
-  --chart-axis: #454542;
-  --chart-track: #1d3554;
+  --chart-ink: #bf6bf0;
+  --chart-other: #5c5a66;
+  --chart-grid: #2a2930;
+  --chart-axis: #45434d;
+  --chart-track: #3a2452;
 
-  --sidebar: #131312;
-  --sidebar-foreground: #f0efec;
-  --sidebar-primary: #f0efec;
-  --sidebar-primary-foreground: #1a1a19;
-  --sidebar-accent: #232322;
-  --sidebar-accent-foreground: #f0efec;
-  --sidebar-border: #2e2e2c;
-  --sidebar-ring: #3987e5;
+  --sidebar: #3a0a5e;
+  --sidebar-foreground: #f2f1f5;
+  --sidebar-muted: #d9bff0;
+  --sidebar-marker: #ffffff;
+  --sidebar-primary: #f2f1f5;
+  --sidebar-primary-foreground: #3a0a5e;
+  --sidebar-accent: #530789;
+  --sidebar-accent-foreground: #f2f1f5;
+  --sidebar-border: #4a1273;
+  --sidebar-ring: #ffffff;
 }
 
 @layer base {
@@ -181,6 +200,11 @@
   /* Numbers that line up in columns; big standalone figures stay proportional. */
   .tabular {
     font-variant-numeric: tabular-nums;
+  }
+  /* Codes and account numbers: the text face, evenly spaced, slightly opened up. */
+  .code {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
   }
 }
 

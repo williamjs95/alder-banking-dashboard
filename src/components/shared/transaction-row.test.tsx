@@ -49,13 +49,13 @@ describe("TransactionRow", () => {
     ).toBeInTheDocument();
   });
 
-  it("names the link with its text, leaving out the decorative dots and icons", () => {
+  it("names the link with its parts separated by commas, leaving out the decorative rules and icons", () => {
     render(<TransactionRow transaction={transactions.failed} />);
 
-    // jsdom applies no CSS, so the spacing between the parts is not asserted.
+    // The visible separators are thin rules; a screen reader hears commas.
     expect(
       screen.getByRole("link", {
-        name: /^Hartwell Staffing\s*May 26\s*ACH\s*Failed\s*-\$4,200\.00$/,
+        name: /^Hartwell Staffing\s*May 26\s*,\s*ACH\s*,\s*Failed\s*-\$4,200\.00$/,
       }),
     ).toBeInTheDocument();
   });

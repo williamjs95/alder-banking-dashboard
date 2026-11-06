@@ -112,8 +112,12 @@ test("sorting by amount orders rows and announces the direction", async ({
     (await tableRows(page).locator("td:last-child").allInnerTexts()).map(
       (text) => Number(text.replace(/[^0-9.+-]/g, "")),
     );
-  const descending = await amounts();
-  expect(descending).toEqual([...descending].sort((a, b) => b - a));
+  // The header updates at once; the rows follow when the sorted page arrives.
+  await expect(async () => {
+    const descending = await amounts();
+    expect(descending).toEqual([...descending].sort((a, b) => b - a));
+    expect(descending[0]).toBeGreaterThan(0);
+  }).toPass();
 
   await header.getByRole("button").click();
   await expect(header).toHaveAttribute("aria-sort", "ascending");

@@ -14,7 +14,7 @@ export function NavLinks({
   onNavigate?: () => void;
 }) {
   return (
-    <nav aria-label="Primary" className="flex flex-col gap-0.5">
+    <nav aria-label="Primary" className="flex flex-col">
       {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
         const active = pathname !== null && isActive(href, pathname);
         return (
@@ -24,10 +24,10 @@ export function NavLinks({
             onClick={onNavigate}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm font-medium transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
+              "relative flex items-center gap-3 px-5 py-2.5 text-sm font-medium transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-sidebar-ring/60 focus-visible:ring-inset",
               active
-                ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground",
+                ? "bg-sidebar-accent text-sidebar-accent-foreground before:absolute before:inset-y-0 before:left-0 before:w-[3px] before:bg-sidebar-marker"
+                : "text-sidebar-muted hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
             )}
           >
             <Icon className="size-4 shrink-0" aria-hidden="true" />

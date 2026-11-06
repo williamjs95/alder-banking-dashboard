@@ -46,7 +46,7 @@ export function BalanceTooltip({
         {
           name: "Balance",
           value: formatMoney(point.balanceCents),
-          color: "var(--chart-1)",
+          color: "var(--chart-ink)",
         },
       ]}
     />
@@ -75,8 +75,8 @@ export function BalanceChart({ data }: { data: readonly BalancePoint[] }) {
       >
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.14} />
-            <stop offset="100%" stopColor="var(--chart-1)" stopOpacity={0} />
+            <stop offset="0%" stopColor="var(--chart-ink)" stopOpacity={0.14} />
+            <stop offset="100%" stopColor="var(--chart-ink)" stopOpacity={0} />
           </linearGradient>
         </defs>
         <CartesianGrid vertical={false} stroke="var(--chart-grid)" />
@@ -106,7 +106,7 @@ export function BalanceChart({ data }: { data: readonly BalancePoint[] }) {
           type="monotone"
           dataKey="balanceCents"
           name="Balance"
-          stroke="var(--chart-1)"
+          stroke="var(--chart-ink)"
           strokeWidth={2}
           strokeLinejoin="round"
           strokeLinecap="round"

@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { StatTile } from "./stat-tile";
+import { StatStrip, StatTile } from "./stat-tile";
 
 describe("StatTile", () => {
   it("shows the label with its value", () => {
@@ -42,5 +42,22 @@ describe("StatTile", () => {
     const { container } = render(<StatTile label="Money in" value="$5.00" />);
 
     expect(container).toHaveTextContent(/^Money in\$5\.00$/);
+  });
+});
+
+describe("StatStrip", () => {
+  it("lays its tiles out in the columns the caller asks for", () => {
+    const { container } = render(
+      <StatStrip className="grid-cols-2">
+        <StatTile label="Money in" value="$212,062" />
+        <StatTile label="Money out" value="$274,530" />
+      </StatStrip>,
+    );
+
+    const strip = container.firstElementChild as HTMLElement;
+    expect(strip).toHaveClass("grid", "grid-cols-2");
+    expect(strip.children).toHaveLength(2);
+    expect(screen.getByText("Money in")).toBeInTheDocument();
+    expect(screen.getByText("$274,530")).toBeInTheDocument();
   });
 });

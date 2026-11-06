@@ -24,14 +24,14 @@ export function AppShell({ children }: { children: ReactNode }) {
         Skip to content
       </a>
 
-      <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar lg:flex">
+      <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col bg-sidebar text-sidebar-foreground lg:flex">
         <Link
           href="/"
-          className="flex h-14 items-center px-4 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+          className="flex h-14 items-center px-5 outline-none focus-visible:ring-[3px] focus-visible:ring-sidebar-ring/60"
         >
           <Logo />
         </Link>
-        <div className="flex-1 overflow-y-auto px-3 py-2">
+        <div className="flex-1 overflow-y-auto py-3">
           {/* The active link depends on the URL, which a static shell cannot know. */}
           <Suspense fallback={<NavLinks pathname={null} />}>
             <SidebarNav />
@@ -43,7 +43,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-background/85 px-4 backdrop-blur-sm sm:px-6">
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-background/90 px-4 backdrop-blur-sm sm:px-6">
           <Suspense fallback={null}>
             <MobileNav />
           </Suspense>

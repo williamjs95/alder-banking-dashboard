@@ -1,7 +1,7 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowLeftRight, ArrowRight } from "lucide-react";
+import { ArrowLeftRight } from "lucide-react";
 import Link from "next/link";
 import { Money } from "@/components/shared/money";
 import { Button } from "@/components/ui/button";
@@ -61,13 +61,9 @@ export function AccountsView() {
                     </p>
                     <Money
                       cents={account.balanceCents}
-                      className="text-2xl font-semibold tracking-tight"
+                      className="font-display text-[1.625rem] leading-tight font-medium"
                     />
                   </div>
-                  <ArrowRight
-                    className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5"
-                    aria-hidden="true"
-                  />
                 </div>
               </Card>
             </Link>

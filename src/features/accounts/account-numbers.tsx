@@ -35,7 +35,7 @@ export function AccountNumbers({
       <dl className="grid gap-3 sm:grid-cols-2">
         <div>
           <dt className="text-xs text-muted-foreground">Account number</dt>
-          <dd className="flex items-center gap-1 font-mono text-sm">
+          <dd className="flex items-center gap-1 code text-sm">
             {shown ? shown.accountNumber : `••••••••${last4}`}
             {shown && (
               <CopyButton value={shown.accountNumber} label="account number" />
@@ -44,7 +44,7 @@ export function AccountNumbers({
         </div>
         <div>
           <dt className="text-xs text-muted-foreground">Routing number</dt>
-          <dd className="flex items-center gap-1 font-mono text-sm">
+          <dd className="flex items-center gap-1 code text-sm">
             {shown ? shown.routingNumber : "•••••••••"}
             {shown && (
               <CopyButton value={shown.routingNumber} label="routing number" />

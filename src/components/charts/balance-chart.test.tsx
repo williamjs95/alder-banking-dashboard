@@ -155,7 +155,7 @@ describe("BalanceChart", () => {
     expect(chart).toHaveAttribute("height", "240");
     const lines = container.querySelectorAll("path.recharts-area-curve");
     expect(lines).toHaveLength(1);
-    expect(lines[0]).toHaveAttribute("stroke", "var(--chart-1)");
+    expect(lines[0]).toHaveAttribute("stroke", "var(--chart-ink)");
   });
 
   it("draws a steadily rising balance as a line that climbs left to right", () => {

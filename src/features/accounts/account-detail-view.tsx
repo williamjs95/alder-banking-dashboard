@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowLeft, ArrowRight, ReceiptText } from "lucide-react";
+import { ArrowLeft, ReceiptText } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import {
@@ -15,7 +15,7 @@ import { ChartCard } from "@/components/charts/chart-card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Money } from "@/components/shared/money";
 import { SegmentedControl } from "@/components/shared/segmented-control";
-import { StatTile } from "@/components/shared/stat-tile";
+import { StatStrip, StatTile } from "@/components/shared/stat-tile";
 import { TransactionRow } from "@/components/shared/transaction-row";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -46,7 +46,7 @@ export function AccountDetailView({ accountId }: { accountId: string }) {
           <ArrowLeft className="size-4" aria-hidden="true" />
           All accounts
         </Link>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight">
+        <h1 className="mt-2 font-display text-[1.75rem] leading-tight font-semibold">
           {account.name}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -71,7 +71,7 @@ export function AccountDetailView({ accountId }: { accountId: string }) {
           description={
             <Money
               cents={account.balanceCents}
-              className="mt-1 block text-3xl font-semibold tracking-tight text-foreground"
+              className="mt-1 block font-display text-3xl font-medium text-foreground"
             />
           }
         >
@@ -79,7 +79,7 @@ export function AccountDetailView({ accountId }: { accountId: string }) {
         </ChartCard>
 
         <div className="grid content-start gap-4">
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-1">
+          <StatStrip className="grid-cols-2 lg:grid-cols-1">
             <StatTile
               label="Money in · 30 days"
               value={<Money cents={last30Days.inflowCents} whole />}
@@ -88,7 +88,7 @@ export function AccountDetailView({ accountId }: { accountId: string }) {
               label="Money out · 30 days"
               value={<Money cents={last30Days.outflowCents} whole />}
             />
-          </div>
+          </StatStrip>
           <Card className="gap-3 px-5 py-4 shadow-none">
             <h2 className="text-sm font-medium">Account details</h2>
             <AccountNumbers accountId={account.id} last4={account.last4} />
@@ -101,10 +101,9 @@ export function AccountDetailView({ accountId }: { accountId: string }) {
           <h2 className="text-sm font-medium">Recent activity</h2>
           <Link
             href={`/transactions?accountId=${account.id}`}
-            className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+            className="text-xs font-medium text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground hover:decoration-current"
           >
             View all
-            <ArrowRight className="size-3.5" aria-hidden="true" />
           </Link>
         </div>
         {recent.isPending ? (

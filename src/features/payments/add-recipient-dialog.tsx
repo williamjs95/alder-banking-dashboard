@@ -124,7 +124,7 @@ function RecipientForm({
           <Input
             inputMode="numeric"
             autoComplete="off"
-            className="font-mono"
+            className="code"
             {...form.register("routingNumber")}
             {...fieldAria("recipient-routing", errors.routingNumber?.message)}
           />
@@ -137,7 +137,7 @@ function RecipientForm({
           <Input
             inputMode="numeric"
             autoComplete="off"
-            className="font-mono"
+            className="code"
             {...form.register("accountNumber")}
             {...fieldAria("recipient-account", errors.accountNumber?.message)}
           />

@@ -36,7 +36,7 @@ export function RankedBars({ items }: { items: readonly RankedBar[] }) {
             </span>
             <span className="mt-1.5 block h-1.5 w-full rounded-full bg-muted">
               <span
-                className="block h-full rounded-full bg-chart-1"
+                className="block h-full rounded-full bg-chart-ink"
                 style={{ width: `${Math.max(1, (item.value / max) * 100)}%` }}
               />
             </span>

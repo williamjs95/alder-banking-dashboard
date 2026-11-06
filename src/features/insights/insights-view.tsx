@@ -11,7 +11,7 @@ import { ChartCard } from "@/components/charts/chart-card";
 import { RankedBars } from "@/components/charts/ranked-bars";
 import { Delta } from "@/components/shared/delta";
 import { Money } from "@/components/shared/money";
-import { StatTile } from "@/components/shared/stat-tile";
+import { StatStrip, StatTile } from "@/components/shared/stat-tile";
 import { Card } from "@/components/ui/card";
 import {
   Table,
@@ -34,7 +34,7 @@ export function InsightsView() {
 
   return (
     <div className="grid gap-4">
-      <div className="grid gap-4 sm:grid-cols-3">
+      <StatStrip className="sm:grid-cols-3">
         <StatTile
           label="Average monthly spend"
           value={<Money cents={insights.averageMonthlySpendCents} whole />}
@@ -78,7 +78,7 @@ export function InsightsView() {
             )
           }
         />
-      </div>
+      </StatStrip>
 
       <div className="grid gap-4 lg:grid-cols-3">
         <ChartCard

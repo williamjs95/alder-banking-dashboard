@@ -29,8 +29,11 @@ export function MobileNav() {
           <Menu />
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-72 gap-0 bg-sidebar p-0">
-        <SheetHeader className="px-4 py-4">
+      <SheetContent
+        side="left"
+        className="w-72 gap-0 border-sidebar-border bg-sidebar p-0 text-sidebar-foreground"
+      >
+        <SheetHeader className="px-5 py-4">
           <SheetTitle asChild>
             <div>
               <Logo />
@@ -40,7 +43,7 @@ export function MobileNav() {
             Main navigation
           </SheetDescription>
         </SheetHeader>
-        <div className="px-3">
+        <div>
           <SidebarNav onNavigate={() => setOpen(false)} />
         </div>
       </SheetContent>

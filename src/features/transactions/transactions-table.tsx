@@ -184,9 +184,10 @@ export function TransactionsTable({
                 <span className="block truncate text-sm font-medium">
                   {transaction.description}
                 </span>
-                <span className="flex flex-wrap items-center gap-x-1.5 text-xs text-muted-foreground">
+                <span className="flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
                   {formatDateWithYear(transaction.postedAt)}
-                  <span aria-hidden="true">·</span>
+                  <span className="sr-only">, </span>
+                  <span aria-hidden="true" className="h-3 w-px bg-border" />
                   {METHOD_LABELS[transaction.method]}
                   {transaction.status !== "posted" && (
                     <StatusBadge status={transaction.status} />

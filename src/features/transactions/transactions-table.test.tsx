@@ -227,10 +227,10 @@ describe("TransactionsTable", () => {
       const items = mobileList().getAllByRole("listitem");
       expect(items).toHaveLength(5);
       expect(items[1]).toHaveTextContent("Stripe");
-      expect(items[1]).toHaveTextContent("Jun 17, 2026·ACH");
+      expect(items[1]).toHaveTextContent("Jun 17, 2026, ACH");
       expect(items[1]).toHaveTextContent("+$11,048.20");
       expect(items[2]).toHaveTextContent("Transfer to Operating Checking");
-      expect(items[2]).toHaveTextContent("Jun 5, 2026·Transfer");
+      expect(items[2]).toHaveTextContent("Jun 5, 2026, Transfer");
       expect(items[2]).toHaveTextContent("-$60,000.00");
     });
 

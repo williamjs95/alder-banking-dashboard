@@ -1,14 +1,17 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Besley, Libre_Franklin } from "next/font/google";
 import { Providers } from "@/components/layout/providers";
 import { THEME_SCRIPT } from "@/components/layout/theme-script";
 import "./globals.css";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+// Libre Franklin for the interface: the plain American gothic of bank forms and
+// statements. Besley, a Clarendon, for balances and titles: the letter banks
+// have put on their buildings and ledgers since the 1840s.
+const franklin = Libre_Franklin({
+  variable: "--font-franklin",
   subsets: ["latin"],
 });
+const besley = Besley({ variable: "--font-besley", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: { default: "Alder", template: "%s · Alder" },
@@ -18,8 +21,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f9f9f7" },
-    { media: "(prefers-color-scheme: dark)", color: "#0d0d0d" },
+    { media: "(prefers-color-scheme: light)", color: "#f4f4f6" },
+    { media: "(prefers-color-scheme: dark)", color: "#121114" },
   ],
 };
 
@@ -29,7 +32,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       data-theme="light"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${franklin.variable} ${besley.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />

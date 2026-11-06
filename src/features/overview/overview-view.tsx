@@ -3,7 +3,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
   ArrowLeftRight,
-  ArrowRight,
   CalendarClock,
   CreditCard,
   ReceiptText,
@@ -28,7 +27,7 @@ import { Delta } from "@/components/shared/delta";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Money } from "@/components/shared/money";
 import { SegmentedControl } from "@/components/shared/segmented-control";
-import { StatTile } from "@/components/shared/stat-tile";
+import { StatStrip, StatTile } from "@/components/shared/stat-tile";
 import { TransactionRow } from "@/components/shared/transaction-row";
 import { Card } from "@/components/ui/card";
 import type { OverviewDto } from "@/lib/contracts";
@@ -70,7 +69,7 @@ function BalanceCard({ overview }: { overview: OverviewDto }) {
       }
       description={
         <>
-          <p className="mt-1 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+          <p className="mt-1 font-display text-4xl font-medium text-foreground sm:text-5xl">
             {dollars}
             <span className="text-2xl text-muted-foreground sm:text-3xl">
               .{cents}
@@ -98,10 +97,9 @@ function AccountsCard({ accounts }: Pick<OverviewDto, "accounts">) {
         <h2 className="text-sm font-medium">Accounts</h2>
         <Link
           href="/accounts"
-          className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+          className="text-xs font-medium text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground hover:decoration-current"
         >
           View all
-          <ArrowRight className="size-3.5" aria-hidden="true" />
         </Link>
       </div>
       <ul className="grid gap-1">
@@ -202,10 +200,9 @@ function ListCard({
         <h2 className="text-sm font-medium">{title}</h2>
         <Link
           href={href}
-          className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+          className="text-xs font-medium text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground hover:decoration-current"
         >
           View all
-          <ArrowRight className="size-3.5" aria-hidden="true" />
         </Link>
       </div>
       {children}
@@ -227,7 +224,7 @@ export function OverviewView() {
         <AccountsCard accounts={overview.accounts} />
       </div>
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <StatStrip className="grid-cols-2 lg:grid-cols-4">
         <StatTile
           label="Money in · 30 days"
           value={<Money cents={last30Days.inflowCents} whole />}
@@ -272,7 +269,7 @@ export function OverviewView() {
             </span>
           }
         />
-      </div>
+      </StatStrip>
 
       <div className="grid gap-4 lg:grid-cols-3">
         <ChartCard

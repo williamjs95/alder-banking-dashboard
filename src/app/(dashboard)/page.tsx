@@ -25,7 +25,7 @@ export default function OverviewPage() {
     <>
       <PageHeader
         title="Overview"
-        description="Brightline Labs, Inc. · cash position across all accounts"
+        description="Cash position across every Brightline Labs account"
       />
       <Suspense fallback={<OverviewSkeleton />}>
         <OverviewData />

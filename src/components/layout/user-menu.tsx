@@ -56,11 +56,11 @@ export function UserMenu() {
         <DropdownMenuTrigger asChild>
           <button
             type="button"
-            className="flex w-full items-center gap-2.5 rounded-md p-2 text-left outline-none hover:bg-sidebar-accent focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            className="flex w-full items-center gap-2.5 rounded-md p-2 text-left outline-none hover:bg-sidebar-accent focus-visible:ring-[3px] focus-visible:ring-sidebar-ring/60"
           >
             <span
               aria-hidden="true"
-              className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-soft text-xs font-semibold text-brand-ink"
+              className="flex size-8 shrink-0 items-center justify-center rounded-full bg-sidebar-accent text-xs font-semibold text-sidebar-foreground"
             >
               {DEMO_USER.initials}
             </span>
@@ -68,12 +68,12 @@ export function UserMenu() {
               <span className="block truncate text-sm font-medium">
                 {DEMO_USER.name}
               </span>
-              <span className="block truncate text-xs text-muted-foreground">
+              <span className="block truncate text-xs text-sidebar-muted">
                 {DEMO_USER.company}
               </span>
             </span>
             <ChevronsUpDown
-              className="size-4 shrink-0 text-muted-foreground"
+              className="size-4 shrink-0 text-sidebar-muted"
               aria-hidden="true"
             />
           </button>

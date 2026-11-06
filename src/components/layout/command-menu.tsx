@@ -180,7 +180,7 @@ export function CommandMenu() {
       >
         <Search aria-hidden="true" />
         <span className="flex-1 truncate text-left">Search or jump to…</span>
-        <kbd className="hidden rounded border bg-muted px-1.5 font-mono text-[10px] leading-5 text-muted-foreground sm:inline">
+        <kbd className="hidden rounded border bg-muted px-1.5 code text-[10px] leading-5 text-muted-foreground sm:inline">
           ⌘K
         </kbd>
       </Button>

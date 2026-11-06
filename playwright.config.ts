@@ -15,6 +15,8 @@ export default defineConfig({
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   reporter: [["list"]],
+  // Client-side navigations can take a few seconds on a busy CI runner.
+  expect: { timeout: 10_000 },
   globalSetup: "./e2e/support/coverage-setup.ts",
   globalTeardown: "./e2e/support/coverage-report.ts",
   use: {

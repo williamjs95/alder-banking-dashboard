@@ -156,7 +156,7 @@ function Details({ transaction }: { transaction: TransactionDto }) {
           cents={transaction.amountCents}
           signed
           tone
-          className="text-3xl font-semibold tracking-tight"
+          className="font-display text-3xl font-medium"
         />
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <StatusBadge status={transaction.status} />
@@ -179,7 +179,7 @@ function Details({ transaction }: { transaction: TransactionDto }) {
           </Row>
         )}
         <Row label="Reference">
-          <span className="font-mono text-xs">{transaction.reference}</span>
+          <span className="code text-xs">{transaction.reference}</span>
           <CopyButton value={transaction.reference} label="reference" />
         </Row>
         <Row label="Category">
