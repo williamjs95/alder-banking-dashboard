@@ -1,9 +1,9 @@
-import { card, expect, test } from "./support/test";
+import { card, expect, test, visit } from "./support/test";
 
 test("insights summarize spend and link through to the transactions behind it", async ({
   page,
 }) => {
-  await page.goto("/insights");
+  await visit(page, "/insights");
   await expect(page.getByText("Average monthly spend")).toBeVisible();
   await expect(page.getByText("Average monthly revenue")).toBeVisible();
 
@@ -34,7 +34,7 @@ test("insights summarize spend and link through to the transactions behind it", 
 });
 
 test("the largest expense tile opens that transaction", async ({ page }) => {
-  await page.goto("/insights");
+  await visit(page, "/insights");
   const tile = page.locator("[data-slot=card]", { hasText: "Largest expense" });
   await tile.getByRole("link").click();
   await expect(page.getByRole("dialog")).toBeVisible();

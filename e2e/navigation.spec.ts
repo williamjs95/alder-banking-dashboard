@@ -1,4 +1,4 @@
-import { expect, test } from "./support/test";
+import { expect, interactive, test, visit } from "./support/test";
 
 const PAGES = [
   { link: "Transactions", path: "/transactions", heading: "Transactions" },
@@ -12,7 +12,7 @@ const PAGES = [
 test("the sidebar reaches every page and marks the current one", async ({
   page,
 }) => {
-  await page.goto("/");
+  await visit(page, "/");
   const nav = page.getByRole("navigation", { name: "Primary" });
 
   for (const { link, path, heading } of PAGES) {
@@ -31,7 +31,7 @@ test("the sidebar reaches every page and marks the current one", async ({
 test("the command palette jumps to a page from the keyboard", async ({
   page,
 }) => {
-  await page.goto("/");
+  await visit(page, "/");
   await page.keyboard.press("ControlOrMeta+k");
   const palette = page.getByRole("dialog", { name: "Search" });
   await expect(palette).toBeVisible();
@@ -48,7 +48,7 @@ test("the command palette jumps to a page from the keyboard", async ({
 test("the command palette finds a transaction and opens its detail", async ({
   page,
 }) => {
-  await page.goto("/");
+  await visit(page, "/");
   await page.getByRole("button", { name: /Search or jump to/ }).click();
   const palette = page.getByRole("dialog", { name: "Search" });
   await palette.getByRole("combobox").fill("WeWork");
@@ -67,7 +67,7 @@ test("the command palette finds a transaction and opens its detail", async ({
 test("the theme toggle switches to dark and the choice survives a reload", async ({
   page,
 }) => {
-  await page.goto("/");
+  await visit(page, "/");
   const html = page.locator("html");
   await expect(html).toHaveAttribute("data-theme", "light");
 
@@ -75,6 +75,7 @@ test("the theme toggle switches to dark and the choice survives a reload", async
   await expect(html).toHaveAttribute("data-theme", "dark");
 
   await page.reload();
+  await interactive(page);
   await expect(html).toHaveAttribute("data-theme", "dark");
   await expect(
     page.getByRole("button", { name: "Switch to light theme" }),
@@ -84,7 +85,7 @@ test("the theme toggle switches to dark and the choice survives a reload", async
 test("an unknown account shows the not-found page with a way back", async ({
   page,
 }) => {
-  await page.goto("/accounts/6f1c2a3b-4d5e-4f60-8a71-9b8c7d6e5f40");
+  await visit(page, "/accounts/6f1c2a3b-4d5e-4f60-8a71-9b8c7d6e5f40");
   await expect(page.getByText("Page not found")).toBeVisible();
 
   await page.getByRole("link", { name: "Back to overview" }).click();
@@ -96,7 +97,7 @@ test("an unknown account shows the not-found page with a way back", async ({
 test("the top bar's Send money button opens the payment dialog from any page", async ({
   page,
 }) => {
-  await page.goto("/insights");
+  await visit(page, "/insights");
   await page.getByRole("link", { name: "Send money" }).click();
   await expect(page.getByRole("dialog", { name: "Send money" })).toBeVisible();
 });

@@ -1,7 +1,7 @@
-import { balances, expect, test } from "./support/test";
+import { balances, expect, test, visit } from "./support/test";
 
 test("each visitor gets a private workspace", async ({ page, browser }) => {
-  await page.goto("/");
+  await visit(page, "/");
   const mine = await balances(page);
 
   const other = await browser.newContext();
@@ -27,7 +27,7 @@ test("each visitor gets a private workspace", async ({ page, browser }) => {
 test("resetting the demo discards changes and restores the starting state", async ({
   page,
 }) => {
-  await page.goto("/");
+  await visit(page, "/");
   const start = await balances(page);
   const accounts = await (await page.request.get("/api/accounts")).json();
   await page.request.post("/api/transfers", {
@@ -51,7 +51,7 @@ test("resetting the demo discards changes and restores the starting state", asyn
 test("the API rejects malformed input with field-level errors", async ({
   page,
 }) => {
-  await page.goto("/");
+  await visit(page, "/");
   const response = await page.request.post("/api/payments", {
     data: { amountCents: -5, method: "carrier-pigeon" },
   });

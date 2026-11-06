@@ -1,9 +1,9 @@
-import { expect, test } from "./support/test";
+import { expect, test, visit } from "./support/test";
 
 test("accounts list every account and open into a detail page", async ({
   page,
 }) => {
-  await page.goto("/accounts");
+  await visit(page, "/accounts");
   await expect(page.getByText(/across 3 accounts/)).toBeVisible();
   await expect(page.getByText("4.60% APY")).toBeVisible();
 
@@ -20,7 +20,7 @@ test("accounts list every account and open into a detail page", async ({
 test("account numbers stay masked until revealed, and can be hidden again", async ({
   page,
 }) => {
-  await page.goto("/accounts");
+  await visit(page, "/accounts");
   await page.getByRole("link", { name: /Operating Checking/ }).click();
 
   await expect(page.getByText("••••••••4821")).toBeVisible();
@@ -40,7 +40,7 @@ test("account numbers stay masked until revealed, and can be hidden again", asyn
 test("an account's activity link filters transactions to that account", async ({
   page,
 }) => {
-  await page.goto("/accounts");
+  await visit(page, "/accounts");
   await page.getByRole("link", { name: /Savings Reserve/ }).click();
   await page.getByRole("radio", { name: "1Y" }).click();
   await expect(page.getByRole("radio", { name: "1Y" })).toBeChecked();

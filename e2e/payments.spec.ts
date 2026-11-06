@@ -1,10 +1,10 @@
-import { balances, card, choose, expect, test } from "./support/test";
+import { balances, card, choose, expect, test, visit } from "./support/test";
 
 const CHECKING = "Operating Checking";
 const SAVINGS = "Savings Reserve";
 
 test.beforeEach(async ({ page }) => {
-  await page.goto("/payments");
+  await visit(page, "/payments");
 });
 
 test("sending an ACH payment debits the account and records the transaction", async ({
@@ -57,7 +57,7 @@ test("a wire adds the fee to the total and to the ledger", async ({ page }) => {
   expect(after[CHECKING]).toBe(before[CHECKING] - 2_015_00);
 
   await dialog.getByRole("button", { name: "Done" }).click();
-  await page.goto("/transactions?q=Outgoing+wire+fee");
+  await visit(page, "/transactions?q=Outgoing+wire+fee");
   await expect(page.locator("table tbody tr")).toHaveCount(1);
   await expect(page.locator("table tbody tr").first()).toContainText("-$15.00");
 });

@@ -5,6 +5,7 @@ import {
   expect,
   tableRows,
   test,
+  visit,
 } from "./support/test";
 
 /**
@@ -24,7 +25,7 @@ const apiError = (
 });
 
 async function reviewPayment(page: import("@playwright/test").Page) {
-  await page.goto("/payments?new=payment");
+  await visit(page, "/payments?new=payment");
   const dialog = page.getByRole("dialog");
   await choose(page, "Recipient", "Pilot.com, Inc.");
   await dialog.getByLabel("Amount").fill("900");
@@ -100,7 +101,7 @@ test("going back from review keeps what was entered", async ({ page }) => {
 test("a transfer that cannot reach the server says so and moves nothing", async ({
   page,
 }) => {
-  await page.goto("/payments?new=transfer");
+  await visit(page, "/payments?new=transfer");
   const before = await balances(page);
   await page.route("**/api/transfers", (route) => route.abort());
   const dialog = page.getByRole("dialog");
@@ -121,7 +122,7 @@ test("a transfer that cannot reach the server says so and moves nothing", async 
 test("a recipient the server rejects shows the message and stays open", async ({
   page,
 }) => {
-  await page.goto("/payments?new=recipient");
+  await visit(page, "/payments?new=recipient");
   await page.route("**/api/recipients", (route) =>
     route.request().method() === "POST"
       ? route.fulfill(
@@ -147,7 +148,7 @@ test("a recipient the server rejects shows the message and stays open", async ({
 });
 
 test("a failed freeze puts the switch back and explains", async ({ page }) => {
-  await page.goto("/cards");
+  await visit(page, "/cards");
   await page.route("**/api/cards/*", (route) =>
     route.fulfill(
       apiError(500, "internal_error", "Could not update the card."),
@@ -180,7 +181,7 @@ test("a failed freeze puts the switch back and explains", async ({ page }) => {
 test("a card close to or past its limit is flagged in words, not just color", async ({
   page,
 }) => {
-  await page.goto("/cards");
+  await visit(page, "/cards");
   const cloud = page
     .locator("main")
     .getByRole("listitem")
@@ -210,7 +211,7 @@ test("a card close to or past its limit is flagged in words, not just color", as
 });
 
 test("the transaction list recovers from a failed load", async ({ page }) => {
-  await page.goto("/transactions");
+  await visit(page, "/transactions");
   await expect(tableRows(page)).toHaveCount(25);
 
   let fail = true;
@@ -237,7 +238,7 @@ test("every kind of transaction explains itself in the detail panel", async ({
 }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
 
-  await page.goto("/transactions?status=failed");
+  await visit(page, "/transactions?status=failed");
   await tableRows(page).first().click();
   let sheet = page.getByRole("dialog");
   await expect(sheet.getByText("Returned", { exact: true })).toBeVisible();
@@ -254,13 +255,13 @@ test("every kind of transaction explains itself in the detail panel", async ({
   await page.keyboard.press("Escape");
   await expect(sheet).toBeHidden();
 
-  await page.goto("/transactions?status=scheduled&order=asc");
+  await visit(page, "/transactions?status=scheduled&order=asc");
   await tableRows(page).first().click();
   sheet = page.getByRole("dialog");
   await expect(sheet.locator("[aria-current=step]")).toHaveText("Scheduled");
   await page.keyboard.press("Escape");
 
-  await page.goto("/transactions?category=transfer&direction=out");
+  await visit(page, "/transactions?category=transfer&direction=out");
   await tableRows(page).first().click();
   sheet = page.getByRole("dialog");
   await expect(sheet.getByText("Internal transfer")).toBeVisible();
@@ -270,7 +271,7 @@ test("every kind of transaction explains itself in the detail panel", async ({
   );
   await expect(sheet.getByText("To", { exact: true })).toBeVisible();
 
-  await page.goto("/transactions?category=cloud");
+  await visit(page, "/transactions?category=cloud");
   await tableRows(page).first().click();
   sheet = page.getByRole("dialog");
   await expect(sheet.getByText(/Cloud infrastructure ••4417/)).toBeVisible();
@@ -290,7 +291,7 @@ test("every kind of transaction explains itself in the detail panel", async ({
 test("a custom date range and an amount range can be set and cleared", async ({
   page,
 }) => {
-  await page.goto("/transactions");
+  await visit(page, "/transactions");
   await page.getByRole("button", { name: "Any date" }).click();
   await page.getByRole("button", { name: "Last month" }).click();
   await expect(page).toHaveURL(/from=\d{4}-\d{2}-01&to=\d{4}-\d{2}-\d{2}/);
@@ -337,7 +338,7 @@ test("an account page survives its activity list failing to load", async ({
       apiError(500, "internal_error", "Something went wrong on our side."),
     ),
   );
-  await page.goto("/accounts");
+  await visit(page, "/accounts");
   await page.getByRole("link", { name: /Treasury/ }).click();
 
   await expect(

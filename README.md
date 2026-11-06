@@ -2,7 +2,7 @@
 
 A business banking dashboard, built as a technical case study for Post Oak Group. It takes its cues from Mercury and Slash, with its own design, data model and implementation.
 
-**Live demo:** _add the deployed URL here_
+**Live demo:** https://alder-banking-dashboard.vercel.app
 
 Open it and you are looking at the accounts of a fictional company, Brightline Labs, Inc. There is no sign-in. Each visitor gets a private copy of the company, seeded with a year of realistic activity, and everything you do to it (send a payment, freeze a card, add a note) is stored in Postgres and is still there when you come back.
 
@@ -95,7 +95,7 @@ A request flows one way: route handler or page → service → database. Service
 | Suite                         | Scope                                                                                                                                                                                                                                                                                                                  | Result                                                                                         |
 | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | Unit and integration (Vitest) | Services against an in-memory Postgres, API route handlers, Zod contracts, utilities, and every component and view                                                                                                                                                                                                     | 1,569 tests in 98 files. 100% of statements, branches, functions and lines                     |
-| End-to-end (Playwright)       | 67 tests in a real browser against a production build: payments, transfers, scheduling, filters, sorting, export, cards, account numbers, themes, the command palette, mobile layout, tenant isolation, demo reset, what happens when the server fails, and an automated WCAG 2.1 AA scan of every page in both themes | 96% of lines, 95% of statements, 91% of functions and 83% of branches of the app's client code |
+| End-to-end (Playwright)       | 67 tests in a real browser against a production build: payments, transfers, scheduling, filters, sorting, export, cards, account numbers, themes, the command palette, mobile layout, tenant isolation, demo reset, what happens when the server fails, and an automated WCAG 2.1 AA scan of every page in both themes | 95% of lines, 95% of statements, 91% of functions and 83% of branches of the app's client code |
 
 The unit coverage threshold is 100% and is enforced by `yarn test:coverage`. Three kinds of file are excluded from it, and covered by the end-to-end suite instead: the vendored shadcn/ui primitives in `src/components/ui`, the thin Server Component files (`page.tsx`, `layout.tsx`, error and not-found pages), and the two framework entry points (`proxy.ts` and `server/session.ts`).
 

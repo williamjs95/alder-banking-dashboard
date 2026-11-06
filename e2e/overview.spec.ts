@@ -1,10 +1,10 @@
-import { balances, card, expect, test } from "./support/test";
+import { balances, card, expect, test, visit } from "./support/test";
 import { formatMoney } from "../src/lib/money";
 
 test("the overview leads with the total of all account balances", async ({
   page,
 }) => {
-  await page.goto("/");
+  await visit(page, "/");
   const byAccount = await balances(page);
   const total = Object.values(byAccount).reduce((sum, cents) => sum + cents, 0);
   const [dollars, cents] = formatMoney(total).split(".");
@@ -23,7 +23,7 @@ test("the overview leads with the total of all account balances", async ({
 test("the balance chart changes range and offers the same data as a table", async ({
   page,
 }) => {
-  await page.goto("/");
+  await visit(page, "/");
   const panel = card(page, "Total balance");
   await expect(panel.getByText("in the last 90 days")).toBeVisible();
 
@@ -46,7 +46,7 @@ test("the balance chart changes range and offers the same data as a table", asyn
 test("the cash flow chart shows a value on hover and has a table view", async ({
   page,
 }) => {
-  await page.goto("/");
+  await visit(page, "/");
   const panel = card(page, "Cash flow");
   await panel.scrollIntoViewIfNeeded();
 
@@ -63,7 +63,7 @@ test("the cash flow chart shows a value on hover and has a table view", async ({
 });
 
 test("a spend category drills into matching transactions", async ({ page }) => {
-  await page.goto("/");
+  await visit(page, "/");
   await page.getByRole("link", { name: /^Payroll/ }).click();
 
   await expect(page).toHaveURL(
@@ -75,7 +75,7 @@ test("a spend category drills into matching transactions", async ({ page }) => {
 });
 
 test("a recent transaction opens its detail", async ({ page }) => {
-  await page.goto("/");
+  await visit(page, "/");
   const recent = card(page, "Recent transactions");
   const first = recent.getByRole("listitem").first().getByRole("link");
   const name = await first.locator("span.block").first().innerText();
@@ -87,7 +87,7 @@ test("a recent transaction opens its detail", async ({ page }) => {
 test("upcoming payments and quick actions lead to the right places", async ({
   page,
 }) => {
-  await page.goto("/");
+  await visit(page, "/");
   const upcoming = card(page, "Upcoming payments");
   await expect(upcoming.getByText(/^Due /).first()).toBeVisible();
 

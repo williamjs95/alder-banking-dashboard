@@ -3,12 +3,14 @@ import {
   choose,
   expect,
   expectEveryCell,
+  interactive,
   tableRows,
   test,
+  visit,
 } from "./support/test";
 
 test.beforeEach(async ({ page }) => {
-  await page.goto("/transactions");
+  await visit(page, "/transactions");
   await expect(tableRows(page)).toHaveCount(25);
 });
 
@@ -172,6 +174,7 @@ test("a transaction's note and category can be edited from its detail", async ({
 
   // The change is stored on the server, not just in the page.
   await page.reload();
+  await interactive(page);
   await expect(tableRows(page).first().getByLabel("Has a note")).toBeVisible();
 });
 
@@ -182,7 +185,7 @@ test("a transaction link restores the open detail, and bad filters are ignored",
   await expect(page).toHaveURL(/tx=/);
   const url = page.url();
 
-  await page.goto(`${url}&status=bogus&pageSize=7`);
+  await visit(page, `${url}&status=bogus&pageSize=7`);
   await expect(page.getByRole("dialog")).toBeVisible();
   await expect(tableRows(page)).toHaveCount(25);
 });

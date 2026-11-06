@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "./support/test";
+import { expect, test, visit } from "./support/test";
 
 const PAGES = [
   "/",
@@ -30,7 +30,7 @@ for (const theme of ["light", "dark"] as const) {
       await page.addInitScript((value) => {
         localStorage.setItem("alder-theme", value);
       }, theme);
-      await page.goto(path);
+      await visit(page, path);
       await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
       await expect(page.locator("main [aria-busy=true]")).toHaveCount(0);
 
@@ -42,11 +42,11 @@ for (const theme of ["light", "dark"] as const) {
 test("open dialogs and panels have no accessibility violations", async ({
   page,
 }) => {
-  await page.goto("/payments?new=payment");
+  await visit(page, "/payments?new=payment");
   await expect(page.getByRole("dialog", { name: "Send money" })).toBeVisible();
   expect(await violations(page)).toEqual([]);
 
-  await page.goto("/transactions");
+  await visit(page, "/transactions");
   await page.locator("table tbody tr").first().click();
   await expect(page.getByRole("dialog")).toBeVisible();
   expect(await violations(page)).toEqual([]);

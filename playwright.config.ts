@@ -41,6 +41,8 @@ export default defineConfig({
     env: {
       ALDER_EMBEDDED_DB: "1",
       PGLITE_DIR: "memory://",
+      // Never let a DATABASE_URL from a local .env file point tests at a real database.
+      DATABASE_URL: "",
       // Source maps let browser coverage be attributed to files under src/.
       E2E_SOURCE_MAPS: "1",
     },

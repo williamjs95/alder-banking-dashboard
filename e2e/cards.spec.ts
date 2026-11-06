@@ -1,7 +1,7 @@
-import { expect, test } from "./support/test";
+import { expect, interactive, test, visit } from "./support/test";
 
 test.beforeEach(async ({ page }) => {
-  await page.goto("/cards");
+  await visit(page, "/cards");
 });
 
 const panel = (page: import("@playwright/test").Page, label: string) =>
@@ -20,6 +20,7 @@ test("freezing a card takes effect immediately and persists", async ({
   await expect(page.getByText("Marketing frozen")).toBeVisible();
 
   await page.reload();
+  await interactive(page);
   await expect(
     panel(page, "Marketing").getByRole("switch", { name: "Freeze card" }),
   ).toBeChecked();

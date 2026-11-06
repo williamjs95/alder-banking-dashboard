@@ -15,6 +15,14 @@ export const test = base.extend<{ recordCoverage: void }>({
       if (enabled) {
         await page.coverage.startJSCoverage({ resetOnNavigation: false });
       }
+      // E2E_CPU_THROTTLE=6 slows the browser down to reproduce a busy CI runner.
+      const throttle = Number(process.env.E2E_CPU_THROTTLE ?? 0);
+      if (browserName === "chromium" && throttle > 1) {
+        const session = await page.context().newCDPSession(page);
+        await session.send("Emulation.setCPUThrottlingRate", {
+          rate: throttle,
+        });
+      }
       await use();
       if (enabled) {
         const entries = await page.coverage.stopJSCoverage();
@@ -27,6 +35,30 @@ export const test = base.extend<{ recordCoverage: void }>({
 });
 
 export { expect };
+
+/**
+ * Resolves once the page can respond to input: the streamed content has
+ * arrived and React has attached its handlers to the controls on screen.
+ * Server-rendered HTML is visible before that point, and a click or key press
+ * sent too early is lost, which shows up as flakiness on slower machines.
+ */
+export async function interactive(page: Page) {
+  await page.waitForFunction(() => {
+    const hydrated = (element: Element) =>
+      Object.keys(element).some((key) => key.startsWith("__reactProps$"));
+    if (document.querySelector("main [aria-busy=true]")) return false;
+    const controls = [
+      ...document.querySelectorAll("header button, main button, main tbody tr"),
+    ];
+    return controls.length > 0 && controls.every(hydrated);
+  });
+}
+
+/** Navigates and waits until the page is ready for interaction. */
+export async function visit(page: Page, path: string) {
+  await page.goto(path);
+  await interactive(page);
+}
 
 /** Current balances by account name, read through the same session as the page. */
 export async function balances(page: Page): Promise<Record<string, number>> {
