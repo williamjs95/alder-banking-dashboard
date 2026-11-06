@@ -9,6 +9,7 @@ import {
   it,
   vi,
 } from "vitest";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { createTestDb, NOW, WORKSPACE_ID } from "../../../test/db";
 import {
@@ -151,6 +152,37 @@ describe("contextFor", () => {
     expect(context.db).toBe(db);
     expect(context.workspaceId).toBe(WORKSPACE_ID);
     expect(context.now).toEqual(NOW);
+  });
+
+  it("settles what is due before the request reads anything", async () => {
+    await contextFor(WORKSPACE_ID);
+    const [account] = await db
+      .select()
+      .from(accounts)
+      .where(eq(accounts.workspaceId, WORKSPACE_ID));
+    const [row] = await db
+      .insert(transactions)
+      .values({
+        workspaceId: WORKSPACE_ID,
+        accountId: account.id,
+        postedAt: NOW,
+        description: "Settled by the next request",
+        amountCents: -1_00,
+        category: "other",
+        method: "ach",
+        status: "pending",
+        settlesAt: NOW,
+        reference: "ALD-SETTLE01",
+      })
+      .returning({ id: transactions.id });
+
+    await contextFor(WORKSPACE_ID);
+
+    const [settled] = await db
+      .select({ status: transactions.status })
+      .from(transactions)
+      .where(eq(transactions.id, row.id));
+    expect(settled.status).toBe("posted");
   });
 
   it("seeds the demo company the first time a workspace is seen, and only then", async () => {

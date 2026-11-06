@@ -1,6 +1,33 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { createTestQueryClient } from "../../test/render";
-import { newIdempotencyKey, refreshLedger } from "./mutations";
+import { SETTLEMENT_DELAY_MS } from "./domain";
+import {
+  newIdempotencyKey,
+  refreshAfterSettlement,
+  refreshLedger,
+} from "./mutations";
+
+describe("refreshAfterSettlement", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("refreshes the ledger only after the settlement time has passed", async () => {
+    vi.useFakeTimers();
+    const queryClient = createTestQueryClient();
+    queryClient.setQueryData(["transactions"], []);
+    const invalidated = () =>
+      queryClient.getQueryCache().getAll()[0].state.isInvalidated;
+
+    refreshAfterSettlement(queryClient);
+
+    await vi.advanceTimersByTimeAsync(SETTLEMENT_DELAY_MS);
+    expect(invalidated()).toBe(false);
+
+    await vi.advanceTimersByTimeAsync(5_000);
+    expect(invalidated()).toBe(true);
+  });
+});
 
 describe("refreshLedger", () => {
   it("marks every cached query stale, whatever its key", async () => {

@@ -1,5 +1,9 @@
 import { randomUUID } from "node:crypto";
-import { SETTLED_STATUSES, type TransactionStatus } from "@/lib/domain";
+import {
+  SETTLED_STATUSES,
+  type TransactionMethod,
+  type TransactionStatus,
+} from "@/lib/domain";
 import type {
   NewAccountRow,
   NewCardRow,
@@ -24,9 +28,6 @@ import { createRng, type Rng } from "./prng";
 export const DEFAULT_SEED = 20_260_611;
 export const HISTORY_DAYS = 365;
 export const SCHEDULE_DAYS = 21;
-/** Card and ACH activity from the last couple of days has not settled yet. */
-const PENDING_WINDOW_DAYS = 1;
-
 const DAY_MS = 86_400_000;
 
 type WithId<T> = T & { id: string };
@@ -84,13 +85,29 @@ function reference(rng: Rng): string {
   return out;
 }
 
-function statusFor(
-  rule: Pick<Rule, "method">,
-  offset: number,
-): TransactionStatus {
-  if (offset > 0) return "scheduled";
-  const settlesSlowly = rule.method === "card" || rule.method === "ach";
-  return settlesSlowly && offset >= -PENDING_WINDOW_DAYS ? "pending" : "posted";
+/** Days a seeded transaction stays pending. Other methods post at once. */
+const SETTLEMENT_DAYS: Partial<Record<TransactionMethod, number>> = {
+  ach: 1,
+  card: 2,
+};
+
+/**
+ * Where a transaction dated `postedAt` stands at `now`: scheduled if it is
+ * still in the future, pending until its method's settlement time has passed,
+ * and posted after that.
+ */
+function settlementFor(
+  method: TransactionMethod,
+  postedAt: Date,
+  now: Date,
+): { status: TransactionStatus; settlesAt: Date | null } {
+  if (postedAt > now) return { status: "scheduled", settlesAt: null };
+  const days = SETTLEMENT_DAYS[method];
+  if (days !== undefined) {
+    const settlesAt = new Date(postedAt.getTime() + days * DAY_MS);
+    if (settlesAt > now) return { status: "pending", settlesAt };
+  }
+  return { status: "posted", settlesAt: null };
 }
 
 /**
@@ -161,15 +178,16 @@ export function generateSeed({
       if (rule.probability !== undefined && !rng.chance(rule.probability)) {
         continue;
       }
+      const postedAt = timeOn(dayStart);
       record({
         account: rule.account,
         accountId: accountIds[rule.account],
-        postedAt: timeOn(dayStart),
+        postedAt,
         description: rule.description,
         amountCents: amountFor(rule, day, rng),
         category: rule.category,
         method: rule.method,
-        status: statusFor(rule, offset),
+        ...settlementFor(rule.method, postedAt, now),
         cardId: rule.card ? cardIds[rule.card] : null,
         recipientId: rule.recipient ? recipientIds[rule.recipient] : null,
       });
@@ -179,7 +197,7 @@ export function generateSeed({
 
     if (day.dom === TREASURY_SWEEP.dom) {
       const postedAt = timeOn(dayStart);
-      const status = statusFor({ method: "transfer" }, offset);
+      const { status } = settlementFor("transfer", postedAt, now);
       record({
         account: "treasury",
         accountId: accountIds.treasury,
@@ -216,7 +234,7 @@ export function generateSeed({
           amountCents: Math.round((balances[key] * apyBps) / 10_000 / 12),
           category: "interest",
           method: "interest",
-          status: statusFor({ method: "interest" }, offset),
+          status: "posted",
         });
       }
     }

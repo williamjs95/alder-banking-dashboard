@@ -126,6 +126,8 @@ export const transactions = pgTable(
     ),
     reference: text("reference").notNull(),
     note: text("note"),
+    /** When a pending transaction posts. Null for anything not pending. */
+    settlesAt: timestamptz("settles_at"),
     /** Client-supplied key that makes money movement safe to retry. */
     idempotencyKey: text("idempotency_key"),
     createdAt: timestamptz("created_at").notNull().defaultNow(),

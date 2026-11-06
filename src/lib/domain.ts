@@ -96,6 +96,13 @@ export type CardType = (typeof CARD_TYPES)[number];
 export const CARD_STATUSES = ["active", "frozen"] as const;
 export type CardStatus = (typeof CARD_STATUSES)[number];
 
+/**
+ * How long a payment a person sends stays pending before it posts. Real ACH
+ * takes a business day or more; the demo shortens it so the change is visible
+ * within one visit.
+ */
+export const SETTLEMENT_DELAY_MS = 60_000;
+
 /** Flat wire fee charged on outgoing wires, in cents. ACH is free. */
 export const WIRE_FEE_CENTS = 1500;
 

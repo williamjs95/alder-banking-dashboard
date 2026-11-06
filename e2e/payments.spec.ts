@@ -39,6 +39,32 @@ test("sending an ACH payment debits the account and records the transaction", as
   await expect(sheet.getByLabel("Note")).toHaveValue("October bookkeeping");
 });
 
+test("a sent payment posts by itself, without reloading the page", async ({
+  page,
+}) => {
+  // Settlement takes a minute, so this one test is deliberately slow.
+  test.setTimeout(120_000);
+  const before = await balances(page);
+
+  await page.getByRole("button", { name: /^Send money/ }).click();
+  const dialog = page.getByRole("dialog");
+  await choose(page, "Recipient", "Pilot.com, Inc.");
+  await dialog.getByLabel("Amount").fill("75");
+  await dialog.getByRole("button", { name: "Review payment" }).click();
+  await dialog.getByRole("button", { name: "Send $75.00" }).click();
+  await dialog.getByRole("link", { name: "View transaction" }).click();
+
+  const sheet = page.getByRole("dialog", { name: "Pilot.com, Inc." });
+  const current = sheet.locator("[aria-current=step]");
+  await expect(current).toHaveText("Processing");
+
+  await expect(current).toHaveCount(0, { timeout: 90_000 });
+  await expect(sheet.getByText("Posted").first()).toBeVisible();
+  // Posting finishes the payment; the money left when it was sent.
+  const after = await balances(page);
+  expect(after[CHECKING]).toBe(before[CHECKING] - 75_00);
+});
+
 test("a wire adds the fee to the total and to the ledger", async ({ page }) => {
   const before = await balances(page);
 

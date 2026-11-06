@@ -249,15 +249,20 @@ describe("generateSeed", () => {
   });
 
   describe("statuses", () => {
-    it("leaves card and ACH activity from yesterday and today pending, and posts everything else", () => {
+    it("keeps ACH pending for a day and card activity for two, and posts everything else", () => {
       const past = data.transactions.filter(
         (row) => row.status !== "scheduled" && row.status !== "failed",
       );
+      const settlementDays: Record<string, number> = { ach: 1, card: 2 };
 
       for (const row of past) {
-        const settlesSlowly = row.method === "card" || row.method === "ach";
-        const recent = startOfDay(when(row)) >= today - DAY_MS;
-        expect(row.status).toBe(settlesSlowly && recent ? "pending" : "posted");
+        const days = settlementDays[row.method] ?? 0;
+        const settlesAt = when(row).getTime() + days * DAY_MS;
+        const pending = settlesAt > NOW.getTime();
+        expect(row.status).toBe(pending ? "pending" : "posted");
+        expect(row.settlesAt ?? null).toEqual(
+          pending ? new Date(settlesAt) : null,
+        );
       }
       expect(past.some((row) => row.status === "pending")).toBe(true);
     });

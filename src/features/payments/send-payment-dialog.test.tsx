@@ -410,7 +410,7 @@ describe("SendPaymentDialog", () => {
       ).toBeInTheDocument();
     });
 
-    it("offers to schedule when a send date is set, with no wire fee yet", async () => {
+    it("offers to schedule when a send date is set, and shows the fee it will charge", async () => {
       const { user } = setup();
       await chooseRecipient(user, "Gunderson Dettmer LLP");
       await enterAmount(user, "1,000");
@@ -425,8 +425,14 @@ describe("SendPaymentDialog", () => {
         Method: "Wire",
         "Send on": "Jul 1, 2026",
         Amount: "$1,000.00",
-        Total: "$1,000.00",
+        "Wire fee": "$15.00",
+        Total: "$1,015.00",
       });
+      expect(
+        screen.getByText(
+          "Check the details. Money leaves your account on the date you chose.",
+        ),
+      ).toBeVisible();
       expect(
         screen.getByRole("button", { name: "Schedule payment" }),
       ).toBeEnabled();

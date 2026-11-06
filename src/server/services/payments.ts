@@ -7,7 +7,7 @@ import type {
   TransferResultDto,
 } from "@/lib/contracts";
 import { dayKey, parseDayKey } from "@/lib/dates";
-import { WIRE_FEE_CENTS } from "@/lib/domain";
+import { SETTLEMENT_DELAY_MS, WIRE_FEE_CENTS } from "@/lib/domain";
 import type { Db, DbExecutor } from "@/server/db/client";
 import {
   accounts,
@@ -83,7 +83,7 @@ async function insertTransaction(
 const keyReused = () =>
   conflict("This Idempotency-Key was already used for a different request.");
 
-const feeKey = (key: string) => `${key}:fee`;
+export const feeKey = (key: string) => `${key}:fee`;
 const creditKey = (key: string) => `${key}:credit`;
 
 /**
@@ -134,6 +134,7 @@ export async function createPayment(
     const feeCents = input.method === "wire" && !scheduled ? WIRE_FEE_CENTS : 0;
     if (!scheduled) await debit(tx, account, input.amountCents + feeCents);
 
+    const settlesAt = new Date(now.getTime() + SETTLEMENT_DELAY_MS);
     const paymentId = await insertTransaction(tx, {
       workspaceId,
       accountId: account.id,
@@ -147,6 +148,7 @@ export async function createPayment(
       category: "other",
       method: input.method,
       status: scheduled ? "scheduled" : "pending",
+      settlesAt: scheduled ? null : settlesAt,
       note: input.memo || null,
       idempotencyKey: idempotencyKey ?? null,
     });
@@ -162,6 +164,7 @@ export async function createPayment(
             category: "other",
             method: "wire",
             status: "pending",
+            settlesAt,
             note: `Fee for wire to ${recipient.name}`,
             idempotencyKey: idempotencyKey ? feeKey(idempotencyKey) : null,
           })

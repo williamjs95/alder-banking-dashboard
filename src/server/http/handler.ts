@@ -4,6 +4,7 @@ import { z } from "zod";
 import type { ApiErrorBody } from "@/lib/contracts";
 import { WORKSPACE_COOKIE } from "@/lib/domain";
 import { getDb, type Db } from "@/server/db/client";
+import { settleDue } from "@/server/services/settlement";
 import { ensureWorkspace } from "@/server/services/workspace";
 import { AppError, conflict, invalid } from "./errors";
 
@@ -29,7 +30,7 @@ export function readCookie(header: string | null, name: string): string | null {
   return null;
 }
 
-/** Resolves the visitor's workspace, seeding it on first use. */
+/** Resolves the visitor's workspace: seeds it on first use, then settles what is due. */
 export async function contextFor(
   workspaceId: string | null | undefined,
 ): Promise<RequestContext> {
@@ -44,6 +45,8 @@ export async function contextFor(
   const db = await getDb();
   const now = new Date();
   await ensureWorkspace(db, parsed.data, now);
+  // Post what has settled and send what has come due before anything is read.
+  await settleDue(db, parsed.data, now);
   return { db, workspaceId: parsed.data, now };
 }
 

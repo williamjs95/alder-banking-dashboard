@@ -41,7 +41,11 @@ import {
   type PaymentMethod,
 } from "@/lib/domain";
 import { formatMoney } from "@/lib/money";
-import { newIdempotencyKey, refreshLedger } from "@/lib/mutations";
+import {
+  newIdempotencyKey,
+  refreshAfterSettlement,
+  refreshLedger,
+} from "@/lib/mutations";
 import { AccountSelect } from "./account-select";
 import { SuccessPanel, SummaryRow } from "./success-panel";
 
@@ -72,8 +76,8 @@ type Step =
   | { name: "review"; input: CreatePaymentInput; key: string }
   | { name: "done"; result: PaymentResultDto };
 
-const feeFor = (input: Pick<CreatePaymentInput, "method" | "scheduledFor">) =>
-  input.method === "wire" && !input.scheduledFor ? WIRE_FEE_CENTS : 0;
+const feeFor = (input: Pick<CreatePaymentInput, "method">) =>
+  input.method === "wire" ? WIRE_FEE_CENTS : 0;
 
 function PaymentFlow({
   accounts,
@@ -114,6 +118,7 @@ function PaymentFlow({
     onSuccess: async (result) => {
       setStep({ name: "done", result });
       await refreshLedger(queryClient);
+      refreshAfterSettlement(queryClient);
     },
     onError: (error) => {
       // Field-level problems go back to the form, next to the field at fault.
@@ -178,7 +183,9 @@ function PaymentFlow({
         <DialogHeader>
           <DialogTitle>Review payment</DialogTitle>
           <DialogDescription>
-            Check the details. Money leaves your account when you confirm.
+            {input.scheduledFor
+              ? "Check the details. Money leaves your account on the date you chose."
+              : "Check the details. Money leaves your account when you confirm."}
           </DialogDescription>
         </DialogHeader>
         <dl className="divide-y rounded-lg border px-4">
