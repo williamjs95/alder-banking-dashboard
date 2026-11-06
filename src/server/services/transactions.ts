@@ -73,7 +73,10 @@ const escapeLike = (value: string) => value.replace(/[\\%_]/g, "\\$&");
 function amountFromSearch(q: string): number | null {
   const cleaned = q.replace(/[$,\s]/g, "");
   if (!/^-?\d+(\.\d{1,2})?$/.test(cleaned)) return null;
-  return Math.round(Math.abs(Number(cleaned)) * 100);
+  const cents = Math.round(Math.abs(Number(cleaned)) * 100);
+  // A long digit string (a pasted account number, say) is not an amount, and
+  // would overflow the bigint comparison if it were sent to the database.
+  return Number.isSafeInteger(cents) ? cents : null;
 }
 
 type FilterFields = Omit<

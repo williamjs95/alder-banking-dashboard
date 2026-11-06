@@ -172,7 +172,13 @@ export function PaymentsView() {
           ) : (
             <EmptyState
               icon={CalendarClock}
-              title={scheduled.isPending ? "Loading…" : "Nothing scheduled"}
+              title={
+                scheduled.isPending
+                  ? "Loading…"
+                  : scheduled.isError
+                    ? "Scheduled payments could not load"
+                    : "Nothing scheduled"
+              }
               description="Choose a future date when sending money and it will wait here."
             />
           )}

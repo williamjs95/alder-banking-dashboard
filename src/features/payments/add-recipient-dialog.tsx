@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm, useWatch } from "react-hook-form";
+import { z } from "zod";
 import { toast } from "sonner";
 import { Field, fieldAria } from "@/components/shared/field";
 import { SegmentedControl } from "@/components/shared/segmented-control";
@@ -19,16 +20,22 @@ import { Input } from "@/components/ui/input";
 import { api, ApiError, errorMessage } from "@/lib/api-client";
 import {
   createRecipientSchema,
-  type CreateRecipientFormValues,
   type CreateRecipientInput,
   type RecipientDto,
 } from "@/lib/contracts";
+import { PAYMENT_METHODS } from "@/lib/domain";
 import { queryKeys } from "@/lib/queries";
 
 const METHODS = [
   { value: "ach", label: "ACH" },
   { value: "wire", label: "Wire" },
 ] as const;
+
+/** In the form a method is always chosen; only the API treats it as optional. */
+const recipientFormSchema = createRecipientSchema.extend({
+  defaultMethod: z.enum(PAYMENT_METHODS),
+});
+type FormValues = z.input<typeof recipientFormSchema>;
 
 function RecipientForm({
   onClose,
@@ -38,12 +45,8 @@ function RecipientForm({
   onCreated?: (recipient: RecipientDto) => void;
 }) {
   const queryClient = useQueryClient();
-  const form = useForm<
-    CreateRecipientFormValues,
-    unknown,
-    CreateRecipientInput
-  >({
-    resolver: zodResolver(createRecipientSchema),
+  const form = useForm<FormValues, unknown, CreateRecipientInput>({
+    resolver: zodResolver(recipientFormSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -54,11 +57,7 @@ function RecipientForm({
     },
   });
   const { errors } = form.formState;
-  // The "ach" fallback is unreachable: `defaultValues` always holds a method.
-  // It only narrows the schema's optional input type, so it is not a branch.
-  /* v8 ignore next -- @preserve */
-  const method =
-    useWatch({ control: form.control, name: "defaultMethod" }) ?? "ach";
+  const method = useWatch({ control: form.control, name: "defaultMethod" });
 
   const create = useMutation({
     mutationFn: (input: CreateRecipientInput) =>
@@ -72,7 +71,7 @@ function RecipientForm({
     onError: (error) => {
       if (error instanceof ApiError) {
         for (const [field, message] of Object.entries(error.fields)) {
-          form.setError(field as keyof CreateRecipientFormValues, { message });
+          form.setError(field as keyof FormValues, { message });
         }
       }
       toast.error(errorMessage(error));

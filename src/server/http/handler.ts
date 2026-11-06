@@ -18,7 +18,12 @@ export function readCookie(header: string | null, name: string): string | null {
     const separator = part.indexOf("=");
     if (separator === -1) continue;
     if (part.slice(0, separator).trim() === name) {
-      return decodeURIComponent(part.slice(separator + 1).trim());
+      try {
+        return decodeURIComponent(part.slice(separator + 1).trim());
+      } catch {
+        // A malformed percent-escape is a bad cookie, not a server error.
+        return null;
+      }
     }
   }
   return null;

@@ -171,6 +171,18 @@ export type SortField = (typeof SORT_FIELDS)[number];
 export const PAGE_SIZES = [10, 25, 50, 100] as const;
 export const MAX_AMOUNT_CENTS = 10_000_000_00;
 
+/**
+ * Free text from a person. Trimmed, and refused if it contains a NUL
+ * character, which Postgres text columns cannot store.
+ */
+const text = () =>
+  z
+    .string()
+    .trim()
+    .refine((value) => !value.includes("\u0000"), {
+      message: "Remove the unsupported character",
+    });
+
 const isoDate = z.iso.date();
 const csv = <T extends string>(values: readonly [T, ...T[]]) =>
   z
@@ -179,7 +191,7 @@ const csv = <T extends string>(values: readonly [T, ...T[]]) =>
     .pipe(z.array(z.enum(values)));
 
 export const transactionFiltersSchema = z.object({
-  q: z.string().trim().max(100).optional(),
+  q: text().max(100).optional(),
   accountId: z.uuid().optional(),
   cardId: z.uuid().optional(),
   category: csv(CATEGORIES).optional(),
@@ -206,7 +218,7 @@ export type TransactionFiltersInput = z.input<typeof transactionFiltersSchema>;
 
 export const updateTransactionSchema = z
   .object({
-    note: z.string().trim().max(280).nullable().optional(),
+    note: text().max(280).nullable().optional(),
     category: z.enum(ASSIGNABLE_CATEGORIES).optional(),
   })
   .refine((value) => value.note !== undefined || value.category !== undefined, {
@@ -220,7 +232,7 @@ const amountCents = z
   .positive("Enter an amount greater than zero")
   .max(MAX_AMOUNT_CENTS, "Amount is above the per-payment limit");
 
-const memo = z.string().trim().max(140, "Keep the memo under 140 characters");
+const memo = text().max(140, "Keep the memo under 140 characters");
 
 export const createPaymentSchema = z.object({
   fromAccountId: z.uuid("Choose an account"),
@@ -247,12 +259,12 @@ export const createTransferSchema = z
 export type CreateTransferInput = z.infer<typeof createTransferSchema>;
 
 export const createRecipientSchema = z.object({
-  name: z.string().trim().min(2, "Enter the recipient's name").max(80),
+  name: text().min(2, "Enter the recipient's name").max(80),
   email: z
     .union([z.email("Enter a valid email"), z.literal("")])
     .optional()
     .transform((value) => value || undefined),
-  bankName: z.string().trim().min(2, "Enter the bank name").max(80),
+  bankName: text().min(2, "Enter the bank name").max(80),
   routingNumber: z
     .string()
     .trim()
@@ -264,17 +276,16 @@ export const createRecipientSchema = z.object({
   defaultMethod: z.enum(PAYMENT_METHODS).default("ach"),
 });
 export type CreateRecipientInput = z.infer<typeof createRecipientSchema>;
-export type CreateRecipientFormValues = z.input<typeof createRecipientSchema>;
 
 const limitCents = z
-  .number()
+  .number("Enter a limit")
   .int()
   .min(100_00, "The minimum limit is $100")
   .max(250_000_00, "The maximum limit is $250,000");
 
 export const createCardSchema = z.object({
-  label: z.string().trim().min(2, "Give the card a name").max(40),
-  holderName: z.string().trim().min(2, "Enter the cardholder's name").max(60),
+  label: text().min(2, "Give the card a name").max(40),
+  holderName: text().min(2, "Enter the cardholder's name").max(60),
   accountId: z.uuid("Choose an account"),
   monthlyLimitCents: limitCents,
 });

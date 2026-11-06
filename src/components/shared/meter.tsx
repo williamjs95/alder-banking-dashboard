@@ -34,7 +34,7 @@ export function Meter({
       aria-label={label}
       aria-valuemin={0}
       aria-valuemax={max}
-      aria-valuenow={Math.min(value, max)}
+      aria-valuenow={Math.min(Math.max(value, 0), max)}
       className={cn(
         "h-2 w-full overflow-hidden rounded-full bg-chart-track",
         className,

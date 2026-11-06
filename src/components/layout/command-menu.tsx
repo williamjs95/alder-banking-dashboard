@@ -47,7 +47,8 @@ function CommandMenuContent({ onDone }: { onDone: () => void }) {
   const router = useRouter();
   const theme = useTheme();
   const [query, setQuery] = useState("");
-  const debounced = useDebouncedValue(query.trim(), 200);
+  const typed = query.trim();
+  const debounced = useDebouncedValue(typed, 200);
   const searching = debounced.length >= MIN_SEARCH_LENGTH;
 
   const results = useQuery({
@@ -67,6 +68,16 @@ function CommandMenuContent({ onDone }: { onDone: () => void }) {
   const showTheme = matches(themeLabel, query);
   const transactions = searching ? (results.data?.items ?? []) : [];
 
+  // A search is pending from the first keystroke, not only once the request starts.
+  const waiting =
+    typed.length >= MIN_SEARCH_LENGTH &&
+    (typed !== debounced || results.isFetching);
+  const emptyMessage = waiting
+    ? "Searching…"
+    : searching && results.isError
+      ? "Search is unavailable right now. Try again."
+      : "No results.";
+
   return (
     <>
       <CommandInput
@@ -75,9 +86,7 @@ function CommandMenuContent({ onDone }: { onDone: () => void }) {
         placeholder="Search transactions or jump to…"
       />
       <CommandList>
-        <CommandEmpty>
-          {searching && results.isFetching ? "Searching…" : "No results."}
-        </CommandEmpty>
+        <CommandEmpty>{emptyMessage}</CommandEmpty>
 
         {pages.length > 0 && (
           <CommandGroup heading="Go to">

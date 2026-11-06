@@ -14,7 +14,7 @@ import {
   transactions,
   type NewTransactionRow,
 } from "@/server/db/schema";
-import { insufficientFunds, invalid } from "@/server/http/errors";
+import { conflict, insufficientFunds, invalid } from "@/server/http/errors";
 import { getAccountRow } from "./accounts";
 import { getRecipientRow } from "./recipients";
 import { findByIdempotencyKey, getTransaction } from "./transactions";
@@ -75,6 +75,14 @@ async function insertTransaction(
   return inserted.id;
 }
 
+/**
+ * Replaying a key is only safe when it repeats the original request. The same
+ * key with a different amount, account or recipient is a client bug, and
+ * answering it with the earlier result would hide that.
+ */
+const keyReused = () =>
+  conflict("This Idempotency-Key was already used for a different request.");
+
 const feeKey = (key: string) => `${key}:fee`;
 const creditKey = (key: string) => `${key}:credit`;
 
@@ -97,6 +105,12 @@ export async function createPayment(
         idempotencyKey,
       );
       if (payment) {
+        const sameRequest =
+          payment.method === input.method &&
+          payment.accountId === input.fromAccountId &&
+          payment.recipientId === input.recipientId &&
+          payment.amountCents === -input.amountCents;
+        if (!sameRequest) throw keyReused();
         const fee = await findByIdempotencyKey(
           tx,
           workspaceId,
@@ -179,7 +193,15 @@ export async function createTransfer(
         workspaceId,
         creditKey(idempotencyKey),
       );
-      if (debitLeg && creditLeg) return { debit: debitLeg, credit: creditLeg };
+      if (debitLeg) {
+        const sameRequest =
+          creditLeg !== null &&
+          debitLeg.accountId === input.fromAccountId &&
+          creditLeg.accountId === input.toAccountId &&
+          debitLeg.amountCents === -input.amountCents;
+        if (!sameRequest) throw keyReused();
+        return { debit: debitLeg, credit: creditLeg };
+      }
     }
 
     const from = await getAccountRow(tx, workspaceId, input.fromAccountId);

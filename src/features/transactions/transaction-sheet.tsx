@@ -272,8 +272,12 @@ export function TransactionSheet({
           <SheetDescription>Transaction details</SheetDescription>
         </SheetHeader>
         {transaction ? (
-          // Keyed so the note field resets when another transaction opens.
-          <Details key={transaction.id} transaction={transaction} />
+          // Keyed so the note field resets when another transaction opens, or
+          // when the loaded detail carries a newer note than the list row did.
+          <Details
+            key={`${transaction.id}:${transaction.note ?? ""}`}
+            transaction={transaction}
+          />
         ) : query.isError ? (
           <p role="alert" className="px-4 text-sm text-muted-foreground">
             {errorMessage(query.error)}
